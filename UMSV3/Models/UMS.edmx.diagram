@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="bd71a86c76c041948d6dd2954e1c8868" Name="Diagram1">
+        <EntityTypeShape EntityType="UMSModel.ProfilePicture" Width="1.5" PointX="5.25" PointY="2.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="UMSModel.Role" Width="1.5" PointX="0.75" PointY="3.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="UMSModel.Status" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="UMSModel.UserCredential" Width="1.5" PointX="5.25" PointY="5.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="UMSModel.UserInfo" Width="1.5" PointX="3" PointY="2.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="UMSModel.database_firewall_rules" Width="1.5" PointX="0.75" PointY="7.875" IsExpanded="true" />
+        <AssociationConnector Association="UMSModel.FK__ProfilePi__UserI__2F10007B" ManuallyRouted="false" />
+        <AssociationConnector Association="UMSModel.FK__UserInfo__RoleId__29572725" ManuallyRouted="false" />
+        <AssociationConnector Association="UMSModel.FK__UserInfo__Status__286302EC" ManuallyRouted="false" />
+        <AssociationConnector Association="UMSModel.FK__UserCrede__UserI__2C3393D0" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>
