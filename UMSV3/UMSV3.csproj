@@ -200,7 +200,6 @@
     <Content Include="Models\UMS.edmx.diagram">
       <DependentUpon>UMS.edmx</DependentUpon>
     </Content>
-    <None Include="Properties\PublishProfiles\UserManagementSystemklb - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\UserManagementSystemklb - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />
