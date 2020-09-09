@@ -12,6 +12,7 @@ namespace UMSV3.Models
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
+    using System.ComponentModel.DataAnnotations;
 
     public partial class UserInfo
     {
@@ -20,17 +21,26 @@ namespace UMSV3.Models
         {
             this.ProfilePictures = new HashSet<ProfilePicture>();
         }
-    
+
         public int UserId { get; set; }
+        [Required]
         public string UserName { get; set; }
+        [Required]
         public string FirstName { get; set; }
+        [Required]
         public string LastName { get; set; }
+        [Required]
         public string Email { get; set; }
+        [Required]
         [DisplayName("Address")]
         public string C_Address { get; set; }
+        [Required]
         public string City { get; set; }
+        [Required]
         public string Country { get; set; }
+        [Required]
         public string ZipCode { get; set; }
+        [Required]
         public string PhoneNumber { get; set; }
         [DisplayName("Status")]
         public Nullable<int> StatusId { get; set; }
