@@ -24,10 +24,15 @@ namespace UMSV3.Models
 
         public int UserId { get; set; }
         [Required]
+        [RegularExpression(@"^[a-zA-Z0-9][a-zA-Z0-9_]{2,29}$", ErrorMessage = "Please make sure to only use letters and numbers")]
         public string UserName { get; set; }
         [Required]
+        [RegularExpression(@"^[a-zA-Z''-'\s]{1,40}$",
+         ErrorMessage = "Characters and numbers are not allowed.")]
         public string FirstName { get; set; }
         [Required]
+        [RegularExpression(@"^[a-zA-Z''-'\s]{1,40}$",
+         ErrorMessage = "Characters and numbers are not allowed.")]
         public string LastName { get; set; }
         [Required]
         public string Email { get; set; }
