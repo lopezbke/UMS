@@ -59,13 +59,33 @@ namespace UMSV3.Controllers
             {
                 db.UserInfoes.Add(userInfo);
                 db.SaveChanges();
-                return RedirectToAction("Index");
+                var emailEmail = userInfo.Email;
+                var emailFirstName = userInfo.FirstName;
+                var emailLastName = userInfo.LastName;
+                var emailUserName = userInfo.UserName;
+                
+
+                return RedirectToAction("SendEmail", new {email = emailEmail,name =emailFirstName,lastName = emailLastName,userName =emailUserName });
             }
 
             ViewBag.RoleId = new SelectList(db.Roles, "RoleId", "RoleName", userInfo.RoleId);
             ViewBag.StatusId = new SelectList(db.Status, "StatusId", "StatusName", userInfo.StatusId);
             ViewBag.UserId = new SelectList(db.UserCredentials, "UserId", "Password", userInfo.UserId);
             return View(userInfo);
+        }
+
+        public ActionResult SendEmail(string email, string name, string lastName, string userName)
+        {
+            Microsoft.Office.Interop.Outlook.Application application = new Microsoft.Office.Interop.Outlook.Application();
+            /*Microsoft.Office.Interop.Outlook.MailItem mailItem = new Microsoft.Office.Interop.Outlook.MailItem();*/
+           Microsoft.Office.Interop.Outlook.MailItem mailItem= (Microsoft.Office.Interop.Outlook.MailItem)application.CreateItem(Microsoft.Office.Interop.Outlook.OlItemType.olMailItem);
+            mailItem.To = email;
+            mailItem.Subject = "Setup Password";
+            mailItem.HTMLBody = "Hello " + name + "," + "<br>" + "Your login username is: " + userName + "<br>" + "Please visit the link below to create a new password" + "<br>" + "<a href=''> Setup Password</a>" ;
+            mailItem.Send();
+            string a = email;
+            System.Diagnostics.Debug.WriteLine(email);
+            return RedirectToAction("Index");
         }
 
         // GET: UserInfo/Edit/5
