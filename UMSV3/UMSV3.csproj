@@ -237,6 +237,7 @@
     <Content Include="Views\UserInfo\Index.cshtml" />
     <Content Include="Views\UserInfo\Login.cshtml" />
     <Content Include="Views\UserInfo\ForgotPass.cshtml" />
+    <Content Include="Views\UserInfo\NewPassword.cshtml" />
     <None Include="Web.Local.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

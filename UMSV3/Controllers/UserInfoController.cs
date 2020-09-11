@@ -63,9 +63,9 @@ namespace UMSV3.Controllers
                 var emailFirstName = userInfo.FirstName;
                 var emailLastName = userInfo.LastName;
                 var emailUserName = userInfo.UserName;
-                
 
-                return RedirectToAction("SendEmail", new {email = emailEmail,name =emailFirstName,lastName = emailLastName,userName =emailUserName });
+
+                return RedirectToAction("SendEmail", new { email = emailEmail, name = emailFirstName, lastName = emailLastName, userName = emailUserName });
             }
 
             ViewBag.RoleId = new SelectList(db.Roles, "RoleId", "RoleName", userInfo.RoleId);
@@ -78,10 +78,10 @@ namespace UMSV3.Controllers
         {
             Microsoft.Office.Interop.Outlook.Application application = new Microsoft.Office.Interop.Outlook.Application();
             /*Microsoft.Office.Interop.Outlook.MailItem mailItem = new Microsoft.Office.Interop.Outlook.MailItem();*/
-           Microsoft.Office.Interop.Outlook.MailItem mailItem= (Microsoft.Office.Interop.Outlook.MailItem)application.CreateItem(Microsoft.Office.Interop.Outlook.OlItemType.olMailItem);
+            Microsoft.Office.Interop.Outlook.MailItem mailItem = (Microsoft.Office.Interop.Outlook.MailItem)application.CreateItem(Microsoft.Office.Interop.Outlook.OlItemType.olMailItem);
             mailItem.To = email;
             mailItem.Subject = "Setup Password";
-            mailItem.HTMLBody = "Hello " + name + "," + "<br>" + "Your login username is: " + userName + "<br>" + "Please visit the link below to create a new password" + "<br>" + "<a href=''> Setup Password</a>" ;
+            mailItem.HTMLBody = "Hello " + name + "," + "<br>" + "<br>" + "Your login username is: " + userName + "<br>" + "Please visit the link below to create a new password:" + "<br>" + $"<a href='https:localhost:44341/userinfo/NewPassword?name={name}'> Setup Password</a>";
             mailItem.Send();
             string a = email;
             System.Diagnostics.Debug.WriteLine(email);
@@ -151,6 +151,11 @@ namespace UMSV3.Controllers
             return RedirectToAction("Index");
         }
 
+        public ActionResult NewPassword(string name)
+            {
+                ViewBag.Name = name;
+                return View();
+            }
         protected override void Dispose(bool disposing)
         {
             if (disposing)
