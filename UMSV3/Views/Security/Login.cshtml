@@ -1,0 +1,64 @@
+﻿@model UMSV3.Models.UserInfo
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Login</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <style>
+        h1 {
+            margin-top: 0;
+            background-color: black;
+            color: white;
+            font-style: italic;
+            padding: .5em;
+        }
+    </style>
+</head>
+<body style="background-color:darkgrey;">
+    <h1 class="text-center"><b>User Management System - </b>Login</h1>
+    <div class="container">
+        <div class="col-lg-4"></div>
+        <div class="col-lg-4">
+            <div class="form-group jumbotron" style="margin-top:55%;">
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <form action="Login" method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.UserName)
+                        @Html.EditorFor(model => model.UserName, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.UserName, "", new { @class = "text-danger" })
+                        @*<label>UserName</label>
+                            <div>
+                                <input type="text" class="form-control" />
+                            </div>*@
+                    </div>
+                    <div class="form-group" row>
+                        @Html.LabelFor(model => model.Password)
+                        @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+                        @*<label>Password</label>
+                            <input type="password" class="form-control" />*@
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-9">
+                            <button type="submit" value="Login" class="btn btn-primary">Login</button>
+                        </div>
+                        @Html.ActionLink("Forgot Password", "ForgotPass")
+                        @*<div class="col-sm-3"><a href="ForgotPass.cshtml">Forgot Password</a></div>*@
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4"></div>
+</body>
+</html>
+
+@Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/bundles/bootstrap")

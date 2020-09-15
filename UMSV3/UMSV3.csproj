@@ -140,6 +140,8 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\MailController.cs" />
+    <Compile Include="Controllers\SecurityController.cs" />
+    <Compile Include="Controllers\UserCredentialsController.cs" />
     <Compile Include="Controllers\UserInfoController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -235,16 +237,17 @@
     <Content Include="Views\UserInfo\Details.cshtml" />
     <Content Include="Views\UserInfo\Edit.cshtml" />
     <Content Include="Views\UserInfo\Index.cshtml" />
-    <Content Include="Views\UserInfo\Login.cshtml" />
-    <Content Include="Views\UserInfo\ForgotPass.cshtml" />
-    <Content Include="Views\UserInfo\NewPassword.cshtml" />
+    <Content Include="Views\Security\Login.cshtml" />
+    <Content Include="Views\Security\ForgotPass.cshtml" />
+    <Content Include="Views\Security\NewPassword.cshtml" />
     <None Include="Web.Local.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\Mail\" />
+    <Folder Include="Views\UserCredentials\" />
+    <Folder Include="Views\UserCredential\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />

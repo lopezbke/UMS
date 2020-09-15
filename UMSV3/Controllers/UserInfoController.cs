@@ -7,16 +7,16 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using UMSV3.Models;
+using System.Web.Security;
+
 
 namespace UMSV3.Controllers
 {
+    [Authorize]
     public class UserInfoController : Controller
     {
         private UMSEntities db = new UMSEntities();
 
-        public ActionResult Login() {
-            return View();
-        }
         // GET: UserInfo
         public ActionResult Index()
         {
@@ -53,7 +53,7 @@ namespace UMSV3.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "UserId,UserName,FirstName,LastName,Email,C_Address,City,Country,ZipCode,PhoneNumber,StatusId,RoleId")] UserInfo userInfo)
+        public ActionResult Create([Bind(Include = "UserId,UserName,FirstName,LastName,Email,C_Address,City,Country,ZipCode,PhoneNumber,StatusId,RoleId,Password")] UserInfo userInfo)
         {
             if (ModelState.IsValid)
             {
@@ -63,9 +63,9 @@ namespace UMSV3.Controllers
                 var emailFirstName = userInfo.FirstName;
                 var emailLastName = userInfo.LastName;
                 var emailUserName = userInfo.UserName;
+                var credentialUserId = userInfo.UserId;
 
-
-                return RedirectToAction("SendEmail", new { email = emailEmail, name = emailFirstName, lastName = emailLastName, userName = emailUserName });
+                return RedirectToAction("SendEmail", new { email = emailEmail, name = emailFirstName, lastName = emailLastName, userName = emailUserName, userId = credentialUserId });
             }
 
             ViewBag.RoleId = new SelectList(db.Roles, "RoleId", "RoleName", userInfo.RoleId);
@@ -74,18 +74,19 @@ namespace UMSV3.Controllers
             return View(userInfo);
         }
 
-        public ActionResult SendEmail(string email, string name, string lastName, string userName)
+        public ActionResult SendEmail(string email, string name, string lastName, string userName, int  userId)
         {
+            var credentialUserId = userId;
             Microsoft.Office.Interop.Outlook.Application application = new Microsoft.Office.Interop.Outlook.Application();
             /*Microsoft.Office.Interop.Outlook.MailItem mailItem = new Microsoft.Office.Interop.Outlook.MailItem();*/
             Microsoft.Office.Interop.Outlook.MailItem mailItem = (Microsoft.Office.Interop.Outlook.MailItem)application.CreateItem(Microsoft.Office.Interop.Outlook.OlItemType.olMailItem);
             mailItem.To = email;
             mailItem.Subject = "Setup Password";
-            mailItem.HTMLBody = "Hello " + name + "," + "<br>" + "<br>" + "Your login username is: " + userName + "<br>" + "Please visit the link below to create a new password:" + "<br>" + $"<a href='https:localhost:44341/userinfo/NewPassword?name={name}'> Setup Password</a>";
+            mailItem.HTMLBody = "Hello " + name + "," + "<br>" + "<br>" + "Your login username is: " + userName + "<br>" + "Please visit the link below to create a new password:" + "<br>" + $"<a href='https:localhost:44341/Security/NewPassword?name={name}'> Setup Password</a>";
             mailItem.Send();
             string a = email;
             System.Diagnostics.Debug.WriteLine(email);
-            return RedirectToAction("Index");
+            return RedirectToAction("AddUserCredential", "UserCredentials", new {userId =  credentialUserId});
         }
 
         // GET: UserInfo/Edit/5
