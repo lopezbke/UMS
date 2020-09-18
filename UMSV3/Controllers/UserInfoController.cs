@@ -8,7 +8,9 @@ using System.Web;
 using System.Web.Mvc;
 using UMSV3.Models;
 using System.Web.Security;
-
+using System.Data.SqlClient;
+using System.Configuration;
+using Microsoft.Ajax.Utilities;
 
 namespace UMSV3.Controllers
 {
@@ -21,6 +23,7 @@ namespace UMSV3.Controllers
         public ActionResult Index()
         {
             var userInfoes = db.UserInfoes.Include(u => u.Role).Include(u => u.Status).Include(u => u.UserCredential);
+            
             return View(userInfoes.ToList());
         }
 
@@ -61,11 +64,10 @@ namespace UMSV3.Controllers
                 db.SaveChanges();
                 var emailEmail = userInfo.Email;
                 var emailFirstName = userInfo.FirstName;
-                var emailLastName = userInfo.LastName;
                 var emailUserName = userInfo.UserName;
                 var credentialUserId = userInfo.UserId;
 
-                return RedirectToAction("SendEmail", new { email = emailEmail, name = emailFirstName, lastName = emailLastName, userName = emailUserName, userId = credentialUserId });
+                return RedirectToAction("SendEmail", new { email = emailEmail, name = emailFirstName, userName = emailUserName, userId = credentialUserId });
             }
 
             ViewBag.RoleId = new SelectList(db.Roles, "RoleId", "RoleName", userInfo.RoleId);
@@ -74,18 +76,31 @@ namespace UMSV3.Controllers
             return View(userInfo);
         }
 
-        public ActionResult SendEmail(string email, string name, string lastName, string userName, int  userId)
+        public ActionResult SendEmail(string email, string name, string userName, int  userId)
         {
             var credentialUserId = userId;
-            Microsoft.Office.Interop.Outlook.Application application = new Microsoft.Office.Interop.Outlook.Application();
-            /*Microsoft.Office.Interop.Outlook.MailItem mailItem = new Microsoft.Office.Interop.Outlook.MailItem();*/
-            Microsoft.Office.Interop.Outlook.MailItem mailItem = (Microsoft.Office.Interop.Outlook.MailItem)application.CreateItem(Microsoft.Office.Interop.Outlook.OlItemType.olMailItem);
-            mailItem.To = email;
-            mailItem.Subject = "Setup Password";
-            mailItem.HTMLBody = "Hello " + name + "," + "<br>" + "<br>" + "Your login username is: " + userName + "<br>" + "Please visit the link below to create a new password:" + "<br>" + $"<a href='https:localhost:44341/Security/NewPassword?name={name}'> Setup Password</a>";
-            mailItem.Send();
-            string a = email;
-            System.Diagnostics.Debug.WriteLine(email);
+            SqlConnection sqlConnection = new SqlConnection(ConfigurationManager.ConnectionStrings["UMS"].ConnectionString);
+
+            SqlCommand sqlCommand = new SqlCommand("EmailIntoDb", sqlConnection);
+
+            sqlCommand.CommandType = CommandType.StoredProcedure;
+
+            //sqlCommand.Parameters.
+            sqlCommand.Parameters.AddWithValue("@Name", name);
+            sqlCommand.Parameters.AddWithValue("@Email", email);
+            sqlCommand.Parameters.AddWithValue("@UserName", userName);
+            sqlCommand.Parameters.AddWithValue("@bool", false);
+            sqlConnection.Open();
+            var reader = sqlCommand.ExecuteReader();
+            /* Microsoft.Office.Interop.Outlook.Application application = new Microsoft.Office.Interop.Outlook.Application();
+             Microsoft.Office.Interop.Outlook.MailItem mailItem = (Microsoft.Office.Interop.Outlook.MailItem)application.CreateItem(Microsoft.Office.Interop.Outlook.OlItemType.olMailItem);
+             mailItem.To = email;
+             mailItem.Subject = "Setup Password";
+             mailItem.HTMLBody = "Hello " + name + "," + "<br>" + "<br>" + "Your login username is: " + userName + "<br>" + "Please visit the link below to create a new password:" + "<br>" + $"<a href='https:localhost:44341/Security/NewPassword?name={name}'> Setup Password</a>";
+             mailItem.Send();
+             string a = email;
+             System.Diagnostics.Debug.WriteLine(email);*/
+            sqlConnection.Close();
             return RedirectToAction("AddUserCredential", "UserCredentials", new {userId =  credentialUserId});
         }
 
@@ -137,6 +152,11 @@ namespace UMSV3.Controllers
             if (userInfo == null)
             {
                 return HttpNotFound();
+            }
+            if (id == Convert.ToInt32(Session["UserId"])) 
+            {
+               
+                return RedirectToAction("Index");
             }
             return View(userInfo);
         }

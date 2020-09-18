@@ -12,6 +12,8 @@ namespace UMSV3.Models
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
+    using System.ComponentModel.DataAnnotations;
+
     public partial class UserCredential
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
@@ -20,6 +22,9 @@ namespace UMSV3.Models
             this.UserInfoes = new HashSet<UserInfo>();
         }
         public int UserId { get; set; }
+        
+        public string UserName { get; set; }
+       /* [RegularExpression(@"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{4,12}$", ErrorMessage = "Please make sure you include: A Lowercase letter,Uppercase letter and at least One Number")]*/
         public string Password { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
