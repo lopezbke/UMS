@@ -111,7 +111,7 @@ namespace UMSV3.Controllers
         }
         [HttpPost]
         /*[ValidateAntiForgeryToken]*/
-        public ActionResult InitialLogin([Bind(Include ="UserName,OldPassword, Password, ConfirmPassword")] PasswordReset obj) 
+        public ActionResult InitialLogin([Bind(Include ="UserName,OldPassword, Password, ConfirmPassword,Name,Email")] PasswordReset obj) 
         {
             if (ModelState.IsValid)
             {
@@ -122,6 +122,8 @@ namespace UMSV3.Controllers
                 SqlCommand sqlCommand = new SqlCommand("NewPassword", sqlconnection);
                 sqlCommand.Parameters.AddWithValue("@UserName", obj.UserName);
                 sqlCommand.Parameters.AddWithValue("@Password", obj.ConfirmPassword);
+                sqlCommand.Parameters.AddWithValue("@Email", obj.Email);
+                sqlCommand.Parameters.AddWithValue("@FirstName", obj.Name);
                 sqlCommand.CommandType = CommandType.StoredProcedure;
                 sqlconnection.Open();
 
@@ -138,7 +140,7 @@ namespace UMSV3.Controllers
         }
         [HttpPost]
         /*[ValidateAntiForgeryToken]*/
-        public ActionResult SendPasswordEmail([Bind(Include ="UserName,Name,Email ")] EmailPasswordReset obj )
+        public ActionResult SendPasswordEmail([Bind(Include ="UserName,Name,Email,Name,Email ")] EmailPasswordReset obj )
         {
             if (ModelState.IsValid) 
             {
@@ -149,6 +151,8 @@ namespace UMSV3.Controllers
 
                 sqlCommand.Parameters.AddWithValue("@UserName", obj.UserName);
                 sqlCommand.Parameters.AddWithValue("@Password", "Welcome12");
+                sqlCommand.Parameters.AddWithValue("@Email", obj.Email);
+                sqlCommand.Parameters.AddWithValue("@FirstName", obj.Name);
                 sqlCommand2.Parameters.AddWithValue("@UserName", obj.UserName);
                 sqlCommand2.Parameters.AddWithValue("@Name", obj.Name);
                 sqlCommand2.Parameters.AddWithValue("@Email", obj.Email);
