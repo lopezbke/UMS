@@ -71,7 +71,7 @@ namespace UMSV3.Controllers
                     System.Diagnostics.Debug.WriteLine(Session["Password"]);
                     System.Diagnostics.Debug.WriteLine(Session["UserName"]);
                     
-                    if (Session["Password"].ToString() == "Welcome")
+                    if (Session["Password"].ToString() == "Welcome12")
                     {
                         return RedirectToAction("InitialLogin");
                     }
@@ -79,7 +79,7 @@ namespace UMSV3.Controllers
                 if (reader.Read()== false) 
                 {
                     System.Diagnostics.Debug.WriteLine("No combination of that UserName and Password found.");
-                    ViewBag.Shout = "No combination of that UserName and Password found.";
+                    /*ViewBag.Shout = "No combination of that UserName and Password found.";*/
                 }
                 
             }
@@ -101,7 +101,7 @@ namespace UMSV3.Controllers
             Session.Clear();
             return RedirectToAction("Login");
         }
-
+        [Authorize]
         public ActionResult InitialLogin() 
         {
             FormsAuthentication.SignOut();
@@ -110,11 +110,14 @@ namespace UMSV3.Controllers
             return View(obj);
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        /*[ValidateAntiForgeryToken]*/
         public ActionResult InitialLogin([Bind(Include ="UserName,OldPassword, Password, ConfirmPassword")] PasswordReset obj) 
         {
             if (ModelState.IsValid)
             {
+                 
+                FormsAuthentication.SignOut();
+                Session.Clear();
                 SqlConnection sqlconnection = new SqlConnection(ConfigurationManager.ConnectionStrings["UMS"].ConnectionString);
                 SqlCommand sqlCommand = new SqlCommand("NewPassword", sqlconnection);
                 sqlCommand.Parameters.AddWithValue("@UserName", obj.UserName);
@@ -125,7 +128,7 @@ namespace UMSV3.Controllers
                 var reader = sqlCommand.ExecuteReader();
                 reader.Read();
             
-                return RedirectToAction("Login");
+                return RedirectToAction("Logout");
             }
             return View();
         }
@@ -134,7 +137,7 @@ namespace UMSV3.Controllers
             return View();
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        /*[ValidateAntiForgeryToken]*/
         public ActionResult SendPasswordEmail([Bind(Include ="UserName,Name,Email ")] EmailPasswordReset obj )
         {
             if (ModelState.IsValid) 
@@ -145,7 +148,7 @@ namespace UMSV3.Controllers
                 SqlCommand sqlCommand2 = new SqlCommand("EmailIntoDb", sqlconnection);
 
                 sqlCommand.Parameters.AddWithValue("@UserName", obj.UserName);
-                sqlCommand.Parameters.AddWithValue("@Password", "Welcome");
+                sqlCommand.Parameters.AddWithValue("@Password", "Welcome12");
                 sqlCommand2.Parameters.AddWithValue("@UserName", obj.UserName);
                 sqlCommand2.Parameters.AddWithValue("@Name", obj.Name);
                 sqlCommand2.Parameters.AddWithValue("@Email", obj.Email);
@@ -163,7 +166,7 @@ namespace UMSV3.Controllers
                 sqlCommand2.ExecuteReader();
                 sqlconnection.Close();
                 
-                return RedirectToAction("", "UserInfo");
+                return RedirectToAction("Logout");
             }
 
             return View();

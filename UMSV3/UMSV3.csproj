@@ -250,7 +250,6 @@
     <Content Include="Views\Security\SendPasswordEmail.cshtml" />
     <Content Include="Scripts\jquery\jquery.min.map" />
     <Content Include="Scripts\jquery\jquery.slim.min.map" />
-    <Content Include="Views\Security\Shout.cshtml" />
     <None Include="Web.Local.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -30,7 +30,7 @@ namespace UMSV3.Controllers
             }*/
             int a = userId;
             var b = db.Set<UserCredential>();
-            b.Add(new UserCredential {UserId = a, Password = "Welcome" });
+            b.Add(new UserCredential {UserId = a, Password = "Welcome12" });
             System.Diagnostics.Debug.WriteLine(a);
             db.SaveChanges();
             return RedirectToAction("Index","userinfo");

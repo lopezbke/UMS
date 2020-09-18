@@ -13,7 +13,7 @@
         public string UserName { get; set; }
         [Required]
         /* [RegularExpression(@"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{4,12}$", ErrorMessage = "Please make sure you include: A Lowercase letter,Uppercase letter and at least One Number")]*/
-        [RegularExpression(@"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\s).{4,8}$", ErrorMessage = "Password requires one lower case letter, one upper case letter, one digit, 6-12 length, and no spaces.")]
+        [RegularExpression(@"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\s).{4,13}$", ErrorMessage = "Password requires one lower case letter, one upper case letter, one digit, 6-12 length, and no spaces.")]
         public string Password { get; set; }
         public virtual UserInfo UserInfo { get; set; }
         public virtual ICollection<UserInfo> UserInfoes { get; set; }
