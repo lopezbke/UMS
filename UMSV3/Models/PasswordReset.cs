@@ -16,8 +16,9 @@ namespace UMSV3.Models
         public string Password { get; set; }
         [Required]
         [Compare("Password")]
+        [DisplayName("Confirm New Password")]
         public string ConfirmPassword { get; set; }
-        [DisplayName("Temporary Password")]
+        [DisplayName("Temporary or Old Password")]
         public string OldPassword { get; set; }
         public virtual UserInfo UserInfo { get; set; }
         public virtual ICollection<UserInfo> UserInfoes { get; set; }

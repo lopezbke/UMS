@@ -15,19 +15,20 @@
 }
 
 <h2>@ViewBag.TypeOfUser</h2>
-<form>
+<form method="post" action="">
     <div class="form-group">
-        <label></label>
-        <input type="text" class="form-control" placeholder="Filter" />
+        <input type="text" class="form-control" placeholder="Filter" name="obj" id="obj" />
+        <a href="" style="font-weight:bold;">Show All</a>
     </div>
 </form>
 @{
     string c = Convert.ToString(Session["Role"]);
     if (c == "1")
-    {
-        <p>
+    {   
+        <p style="margin:1em;">
             @Html.ActionLink("Create New", "Create")
         </p>
+        
     }
 }
 <table class="table jumbotron">

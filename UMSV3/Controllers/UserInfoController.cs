@@ -27,6 +27,12 @@ namespace UMSV3.Controllers
             return View(userInfoes.ToList());
         }
 
+        [HttpPost]
+        public ActionResult Index(string obj)
+        {
+            var userInfoes = db.UserInfoes.Include(u => u.Role).Include(u => u.Status).Include(u => u.UserCredential).Where(u => u.FirstName == obj);
+            return View(userInfoes);
+        }
         // GET: UserInfo/Details/5
         public ActionResult Details(int? id)
         {
