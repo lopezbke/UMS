@@ -113,7 +113,8 @@ namespace UMSV3.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult InitialLogin([Bind(Include ="UserName,OldPassword, Password, ConfirmPassword")] PasswordReset obj) 
         {
-                
+            if (ModelState.IsValid)
+            {
                 SqlConnection sqlconnection = new SqlConnection(ConfigurationManager.ConnectionStrings["UMS"].ConnectionString);
                 SqlCommand sqlCommand = new SqlCommand("NewPassword", sqlconnection);
                 sqlCommand.Parameters.AddWithValue("@UserName", obj.UserName);
@@ -125,6 +126,8 @@ namespace UMSV3.Controllers
                 reader.Read();
             
                 return RedirectToAction("Login");
+            }
+            return View();
         }
         public ActionResult SendPasswordEmail() 
         {
@@ -134,32 +137,36 @@ namespace UMSV3.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult SendPasswordEmail([Bind(Include ="UserName,Name,Email ")] EmailPasswordReset obj )
         {
+            if (ModelState.IsValid) 
+            {
+                //Reset the Password
+                SqlConnection sqlconnection = new SqlConnection(ConfigurationManager.ConnectionStrings["UMS"].ConnectionString);
+                SqlCommand sqlCommand = new SqlCommand("NewPassword", sqlconnection);
+                SqlCommand sqlCommand2 = new SqlCommand("EmailIntoDb", sqlconnection);
 
-            //Reset the Password
-            SqlConnection sqlconnection = new SqlConnection(ConfigurationManager.ConnectionStrings["UMS"].ConnectionString);
-            SqlCommand sqlCommand = new SqlCommand("NewPassword", sqlconnection);
-            SqlCommand sqlCommand2 = new SqlCommand("EmailIntoDb", sqlconnection);
-
-            sqlCommand.Parameters.AddWithValue("@UserName", obj.UserName);
-            sqlCommand.Parameters.AddWithValue("@Password", "Welcome");
-            sqlCommand2.Parameters.AddWithValue("@UserName", obj.UserName);
-            sqlCommand2.Parameters.AddWithValue("@Name", obj.Name);
-            sqlCommand2.Parameters.AddWithValue("@Email", obj.Email);
-            sqlCommand2.Parameters.AddWithValue("@bool", false);
+                sqlCommand.Parameters.AddWithValue("@UserName", obj.UserName);
+                sqlCommand.Parameters.AddWithValue("@Password", "Welcome");
+                sqlCommand2.Parameters.AddWithValue("@UserName", obj.UserName);
+                sqlCommand2.Parameters.AddWithValue("@Name", obj.Name);
+                sqlCommand2.Parameters.AddWithValue("@Email", obj.Email);
+                sqlCommand2.Parameters.AddWithValue("@bool", false);
 
 
-            sqlCommand.CommandType = CommandType.StoredProcedure;
-            sqlCommand2.CommandType = CommandType.StoredProcedure;
+                sqlCommand.CommandType = CommandType.StoredProcedure;
+                sqlCommand2.CommandType = CommandType.StoredProcedure;
 
-            sqlconnection.Open();
+                sqlconnection.Open();
                 sqlCommand.ExecuteReader();
-            sqlconnection.Close();
+                sqlconnection.Close();
 
-            sqlconnection.Open();
+                sqlconnection.Open();
                 sqlCommand2.ExecuteReader();
-            sqlconnection.Close();
+                sqlconnection.Close();
+                
+                return RedirectToAction("", "UserInfo");
+            }
 
-            return RedirectToAction("","UserInfo");
+            return View();
         }
     }
 }

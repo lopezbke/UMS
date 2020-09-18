@@ -24,28 +24,35 @@ namespace UMSV3.Models
 
         public int UserId { get; set; }
         [Required]
-        [RegularExpression(@"^[a-zA-Z0-9][a-zA-Z0-9_]{2,29}$", ErrorMessage = "Please make sure to only use letters and numbers")]
+        [RegularExpression(@"^([a-zA-Z])[a-zA-Z_-]*[\w_-]*[\S]$|^([a-zA-Z])[0-9_-]*[\S]$|^[a-zA-Z]*[\S]$", ErrorMessage = "Invalid UserName")]
         public string UserName { get; set; }
         [Required]
-        [RegularExpression(@"^[a-zA-Z''-'\s]{1,40}$",
-          ErrorMessage = "Special Characters and numbers are not allowed.")]
+        [RegularExpression(@"^[a-zA-Z]+(([\'\,\.\- ][a-zA-Z ])?[a-zA-Z]*)*$",
+         ErrorMessage = "Special Characters and numbers are not allowed.")]
         public string FirstName { get; set; }
         [Required]
-        [RegularExpression(@"^[a-zA-Z''-'\s]{1,40}$",
+        [RegularExpression(@"^[a-zA-Z]+(([\'\,\.\- ][a-zA-Z ])?[a-zA-Z]*)*$",
          ErrorMessage = "Special Characters and numbers are not allowed.")]
         public string LastName { get; set; }
         [Required]
+        [RegularExpression(@"^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$", ErrorMessage = "Email not Valid")]
         public string Email { get; set; }
         [DisplayName("Address")]
         [Required]
         public string C_Address { get; set; }
        [Required]
+        [RegularExpression(@"^[a-zA-Z]+(([\'\,\.\- ][a-zA-Z ])?[a-zA-Z]*)*$",
+         ErrorMessage = "Special Characters and numbers are not allowed.")]
         public string City { get; set; }
         [Required]
+        [RegularExpression(@"^[a-zA-Z]+(([\'\,\.\- ][a-zA-Z ])?[a-zA-Z]*)*$",
+         ErrorMessage = "Special Characters and numbers are not allowed.")]
         public string Country { get; set; }
        [Required]
+       [RegularExpression(@"^\d{5}(-\d{4})?$", ErrorMessage = "Use standard 5 digit US Zip Codes, or the US ZIP + 4 Standard.")]
         public string ZipCode { get; set; }
         [Required]
+        [RegularExpression(@"^[2-9]\d{2}-\d{3}-\d{4}$", ErrorMessage = "Please use the following format 787-666-1234")]
         public string PhoneNumber { get; set; }
         [DisplayName("Status")]
         public Nullable<int> StatusId { get; set; }
