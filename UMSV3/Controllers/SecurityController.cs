@@ -17,8 +17,9 @@ namespace UMSV3.Controllers
     {
         private UMSEntities db = new UMSEntities();
         // GET: Security
-        public ActionResult Login()
+        public ActionResult Login( string shout)
         {
+            ViewBag.Shout = shout;
             UserCred obj = new UserCred();
             return View(obj);
         }
@@ -41,8 +42,9 @@ namespace UMSV3.Controllers
                 sqlconnection.Open();
 
                 var reader = sqlCommand.ExecuteReader();
-                if (reader.Read()) 
+                try
                 {
+                    reader.Read();
                     /*System.Diagnostics.Debug.WriteLine(reader["UserName"]);
                     System.Diagnostics.Debug.WriteLine(reader["RoleId"]);
                     System.Diagnostics.Debug.WriteLine(reader["Password"]);
@@ -52,36 +54,45 @@ namespace UMSV3.Controllers
                     string role = Convert.ToString(reader["RoleId"]);
                     string password = Convert.ToString(reader["Password"]);
                     string status = Convert.ToString(reader["StatusId"]);
-                       
-                        FormsAuthentication.SetAuthCookie(userId, false);
-                        Session.Add("UserId", userId);
-                        FormsAuthentication.SetAuthCookie(username, false);
-                        Session.Add("UserName", username);
-                        FormsAuthentication.SetAuthCookie(password, false);
-                        Session.Add("Password", password);
-                        FormsAuthentication.SetAuthCookie(Convert.ToString(status), false);
-                        Session.Add("Status", status);
-                        FormsAuthentication.SetAuthCookie(Convert.ToString(role), false);
-                        Session.Add("Role", role);
-                        System.Diagnostics.Debug.WriteLine("Account Found");
+
+                    FormsAuthentication.SetAuthCookie(userId, false);
+                    Session.Add("UserId", userId);
+                    FormsAuthentication.SetAuthCookie(username, false);
+                    Session.Add("UserName", username);
+                    FormsAuthentication.SetAuthCookie(password, false);
+                    Session.Add("Password", password);
+                    FormsAuthentication.SetAuthCookie(Convert.ToString(status), false);
+                    Session.Add("Status", status);
+                    FormsAuthentication.SetAuthCookie(Convert.ToString(role), false);
+                    Session.Add("Role", role);
+                    System.Diagnostics.Debug.WriteLine("Account Found");
 
                     System.Diagnostics.Debug.WriteLine(Session["UserId"]);
                     System.Diagnostics.Debug.WriteLine(Session["Role"]);
                     System.Diagnostics.Debug.WriteLine(Session["Status"]);
                     System.Diagnostics.Debug.WriteLine(Session["Password"]);
                     System.Diagnostics.Debug.WriteLine(Session["UserName"]);
-                    
+
                     if (Session["Password"].ToString() == "Welcome12")
                     {
                         return RedirectToAction("InitialLogin");
                     }
                 }
-                if (reader.Read()== false) 
+                catch 
                 {
                     System.Diagnostics.Debug.WriteLine("No combination of that UserName and Password found.");
+                    string shout = "No combination of that UserName and Password found.";
                     /*ViewBag.Shout = "No combination of that UserName and Password found.";*/
+                    return RedirectToAction("Login", new { shout = shout });
                 }
-                
+               /* if (reader.Read())
+                {
+                    System.Diagnostics.Debug.WriteLine("No combination of that UserName and Password found.");
+                    string shout = "No combination of that UserName and Password found.";
+                    *//*ViewBag.Shout = "No combination of that UserName and Password found.";*//*
+                    return RedirectToAction("Login", new { shout = shout });
+                }*/
+
             }
 
             /*var isUserName = db.UserInfoes.Any(x => x.UserName == obj.UserName);
