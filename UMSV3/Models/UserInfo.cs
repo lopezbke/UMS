@@ -13,6 +13,7 @@ namespace UMSV3.Models
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.ComponentModel.DataAnnotations;
+    using System.Web;
 
     public partial class UserInfo
     {
@@ -20,6 +21,7 @@ namespace UMSV3.Models
         public UserInfo()
         {
             this.ProfilePictures = new HashSet<ProfilePicture>();
+             
         }
 
         public int UserId { get; set; }
@@ -58,6 +60,8 @@ namespace UMSV3.Models
         public Nullable<int> StatusId { get; set; }
         [DisplayName("Role")]
         public Nullable<int> RoleId { get; set; }
+
+       /* public HttpPostedFileBase fileUpload { get; set; }*/
         
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ProfilePicture> ProfilePictures { get; set; }

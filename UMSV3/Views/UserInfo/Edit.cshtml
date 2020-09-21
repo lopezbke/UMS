@@ -9,7 +9,7 @@
     string a = Convert.ToString(Session["Role"]);
     if (a == "1" || Convert.ToUInt32(Session["UserId"]) == Model.UserId)
     {
-        using (Html.BeginForm())
+        using (Html.BeginForm("Edit","UserInfo",FormMethod.Post, new {enctype= "multipart/form-data" }))
         {
             @Html.AntiForgeryToken()
 
@@ -90,6 +90,7 @@
             @Html.ValidationMessageFor(model => model.PhoneNumber, "", new { @class = "text-danger" })
         </div>
     </div>
+   @* <input  type="file" id="fileUpload" name="fileUpload"/>*@
     @{
         if (a == "1")
         {

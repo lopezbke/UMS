@@ -11,7 +11,7 @@ using System.Web.Security;
 using System.Data.SqlClient;
 using System.Configuration;
 using Microsoft.Ajax.Utilities;
-
+using System.IO;
 namespace UMSV3.Controllers
 {
     [Authorize]
@@ -146,11 +146,16 @@ namespace UMSV3.Controllers
             {
                 db.Entry(userInfo).State = EntityState.Modified;
                 db.SaveChanges();
-                return RedirectToAction("Index");
+                
+
+
+                //Image Upload
+               
             }
             ViewBag.RoleId = new SelectList(db.Roles, "RoleId", "RoleName", userInfo.RoleId);
             ViewBag.StatusId = new SelectList(db.Status, "StatusId", "StatusName", userInfo.StatusId);
             ViewBag.UserId = new SelectList(db.UserCredentials, "UserId", "Password", userInfo.UserId);
+
             return View(userInfo);
         }
 
