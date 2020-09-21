@@ -111,22 +111,23 @@
             @*<td>
                     @Html.DisplayFor(modelItem => item.UserCredential.Password)
                 </td>*@
-            <td>
+        <td>
+            @Html.ActionLink("Details ", "Details", new { id = item.UserId })
+            @{ string a = Convert.ToString(Session["Role"]);
 
-                @{
-                    string a = Convert.ToString(Session["Role"]);
-                    if (a == "1")
-                    {
-                        @Html.ActionLink("Details ", "Details", new { id = item.UserId })
-                        @Html.ActionLink("Edit ", "Edit", new { id = item.UserId })
-                        if (Convert.ToInt32(Session["UserId"]) != item.UserId)
-                        {
-                            @Html.ActionLink("Delete", "Delete", new { id = item.UserId })
-                        }
-
-                    }
+                if (a == "1" || Convert.ToUInt32(Session["UserId"]) == item.UserId)
+                {
+                    @Html.ActionLink("Edit ", "Edit", new { id = item.UserId })
                 }
-            </td>
+
+
+                if (a == "1" && Convert.ToInt32(Session["UserId"]) != item.UserId)
+                {
+                    @Html.ActionLink("Delete", "Delete", new { id = item.UserId })
+
+                }
+            }
+        </td>
         </tr>
     }
 

@@ -51,6 +51,10 @@ namespace UMSV3.Controllers
         // GET: UserInfo/Create
         public ActionResult Create()
         {
+            if (Convert.ToString(Session["Role"]) == "2")
+            {
+                return RedirectToAction("Index");
+            }
             ViewBag.RoleId = new SelectList(db.Roles, "RoleId", "RoleName");
             ViewBag.StatusId = new SelectList(db.Status, "StatusId", "StatusName");
             ViewBag.UserId = new SelectList(db.UserCredentials, "UserId", "Password");
@@ -122,6 +126,7 @@ namespace UMSV3.Controllers
             {
                 return HttpNotFound();
             }
+           
             ViewBag.RoleId = new SelectList(db.Roles, "RoleId", "RoleName", userInfo.RoleId);
             ViewBag.StatusId = new SelectList(db.Status, "StatusId", "StatusName", userInfo.StatusId);
             ViewBag.UserId = new SelectList(db.UserCredentials, "UserId", "Password", userInfo.UserId);

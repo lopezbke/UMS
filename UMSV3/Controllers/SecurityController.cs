@@ -19,6 +19,8 @@ namespace UMSV3.Controllers
         // GET: Security
         public ActionResult Login( string shout, string color)
         {
+            FormsAuthentication.SignOut();
+            Session.Clear();
             ViewBag.Shout = shout;
             ViewBag.color = color;
             UserCred obj = new UserCred();
@@ -138,8 +140,8 @@ namespace UMSV3.Controllers
             {
                  
                 SqlConnection sqlconnection = new SqlConnection(ConfigurationManager.ConnectionStrings["UMS"].ConnectionString);
-               /* try
-                {*/
+                try
+                {
                     SqlCommand sqlCommand2 = new SqlCommand("FormConfirm", sqlconnection);
                     sqlCommand2.CommandType = CommandType.StoredProcedure;
                     sqlCommand2.Parameters.AddWithValue("@UserName", obj.UserName);
@@ -149,9 +151,9 @@ namespace UMSV3.Controllers
 
                     var verify = sqlCommand2.ExecuteReader();
                     verify.Read();
-                    System.Diagnostics.Debug.WriteLine("Verification UserName" + verify.GetString(2));
-                    System.Diagnostics.Debug.WriteLine("Verification First Name" + verify.GetString(3));
-                    System.Diagnostics.Debug.WriteLine("Verification Email" + verify.GetString(5));
+                    System.Diagnostics.Debug.WriteLine("Verification UserName: " + verify.GetString(2));
+                    System.Diagnostics.Debug.WriteLine("Verification First Name: " + verify.GetString(3));
+                    System.Diagnostics.Debug.WriteLine("Verification Email: " + verify.GetString(5));
 
                     SqlCommand sqlCommand = new SqlCommand("NewPassword", sqlconnection);
                     sqlCommand.Parameters.AddWithValue("@UserName", obj.UserName);
@@ -167,15 +169,15 @@ namespace UMSV3.Controllers
                     FormsAuthentication.SignOut();
                     Session.Clear();
                     return RedirectToAction("Login", new {shout = "Password Setup was sucessful.", color = "text-success " });
-                    
 
-                /*}*/
-               /* catch 
+
+                }
+                catch
                 {
                     System.Diagnostics.Debug.WriteLine("Input combination does not return a row.");
-                    
+
                     return RedirectToAction("InitialLogin", new { initialLoginShout = initialLoginShout });
-                }*/
+                }
             }
 
             return RedirectToAction("InitialLogin", new { initialLoginShout = initialLoginShout });
