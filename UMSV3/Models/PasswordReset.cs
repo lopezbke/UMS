@@ -29,10 +29,10 @@ namespace UMSV3.Models
         [DisplayName("Confirm New Password")]
         [RegularExpression(@"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\s).{4,13}$", ErrorMessage = "Password requires one lower case letter, one upper case letter, one digit, 6-12 length, and no spaces.")]
         public string ConfirmPassword { get; set; }
-        [Required]
+       /* [Required]
         [DisplayName("Temporary Password")]
         [RegularExpression(@"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\s).{4,13}$", ErrorMessage = "Password requires one lower case letter, one upper case letter, one digit, 6-12 length, and no spaces.")]
-        public string OldPassword { get; set; }
+        public string OldPassword { get; set; }*/
         public virtual UserInfo UserInfo { get; set; }
         public virtual ICollection<UserInfo> UserInfoes { get; set; }
     }

@@ -17,9 +17,10 @@ namespace UMSV3.Controllers
     {
         private UMSEntities db = new UMSEntities();
         // GET: Security
-        public ActionResult Login( string shout)
+        public ActionResult Login( string shout, string color)
         {
             ViewBag.Shout = shout;
+            ViewBag.color = color;
             UserCred obj = new UserCred();
             return View(obj);
         }
@@ -28,7 +29,8 @@ namespace UMSV3.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Login([Bind(Include = "UserName, Password, Shout")] UserCred obj)
         {
-            System.Diagnostics.Debug.WriteLine(obj.UserName);
+
+            string color ="text-danger";
             var errors = ModelState.Values.SelectMany(v => v.Errors);
             System.Diagnostics.Debug.WriteLine(errors);
             if (ModelState.IsValid)
@@ -83,7 +85,7 @@ namespace UMSV3.Controllers
                     {
                         System.Diagnostics.Debug.WriteLine(Session["Status"]);
                         string shout = "Account is currently inactive, please contact admin at admin@UMS.com ";
-                        return RedirectToAction("Login", new { shout = shout });
+                        return RedirectToAction("Login", new { shout = shout, color = color });
 
                     }
                    
@@ -93,12 +95,12 @@ namespace UMSV3.Controllers
                     System.Diagnostics.Debug.WriteLine("No combination of that UserName and Password found.");
                     string shout = "Invalid Credentials, please try again.";
                     /*ViewBag.Shout = "No combination of that UserName and Password found.";*/
-                    return RedirectToAction("Login", new { shout = shout });
+                    return RedirectToAction("Login", new { shout = shout, color = color });
                 }
               
 
             }
-
+            //Old code
             /*var isUserName = db.UserInfoes.Any(x => x.UserName == obj.UserName);
         var isPassword = db.UserCredentials.Any(y => y.Password == obj.Password);*/
             /* string query1 = "SELECT TOP 1 UserId FROM UserInfo WHERE UserName = @userName";
@@ -117,37 +119,66 @@ namespace UMSV3.Controllers
             return RedirectToAction("Login");
         }
         [Authorize]
-        public ActionResult InitialLogin() 
+        public ActionResult InitialLogin(string initialLoginShout) 
         {
-            FormsAuthentication.SignOut();
-            Session.Clear();
+            ViewBag.initialLoginShout = initialLoginShout;
+            
             PasswordReset obj = new PasswordReset();
             return View(obj);
         }
+
         [HttpPost]
         /*[ValidateAntiForgeryToken]*/
-        public ActionResult InitialLogin([Bind(Include ="UserName,OldPassword, Password, ConfirmPassword,Name,Email")] PasswordReset obj) 
+        public ActionResult InitialLogin([Bind(Include ="UserName, Password, ConfirmPassword,Name,Email")] PasswordReset obj) 
         {
+            
+            string initialLoginShout = "One or more fields are invalid.";
+
             if (ModelState.IsValid)
             {
                  
-                FormsAuthentication.SignOut();
-                Session.Clear();
                 SqlConnection sqlconnection = new SqlConnection(ConfigurationManager.ConnectionStrings["UMS"].ConnectionString);
-                SqlCommand sqlCommand = new SqlCommand("NewPassword", sqlconnection);
-                sqlCommand.Parameters.AddWithValue("@UserName", obj.UserName);
-                sqlCommand.Parameters.AddWithValue("@Password", obj.ConfirmPassword);
-                sqlCommand.Parameters.AddWithValue("@Email", obj.Email);
-                sqlCommand.Parameters.AddWithValue("@FirstName", obj.Name);
-                sqlCommand.CommandType = CommandType.StoredProcedure;
-                sqlconnection.Open();
+               /* try
+                {*/
+                    SqlCommand sqlCommand2 = new SqlCommand("FormConfirm", sqlconnection);
+                    sqlCommand2.CommandType = CommandType.StoredProcedure;
+                    sqlCommand2.Parameters.AddWithValue("@UserName", obj.UserName);
+                    sqlCommand2.Parameters.AddWithValue("@FirstName", obj.Name);
+                    sqlCommand2.Parameters.AddWithValue("@Email", obj.Email);
+                    sqlconnection.Open();
 
+                    var verify = sqlCommand2.ExecuteReader();
+                    verify.Read();
+                    System.Diagnostics.Debug.WriteLine("Verification UserName" + verify.GetString(2));
+                    System.Diagnostics.Debug.WriteLine("Verification First Name" + verify.GetString(3));
+                    System.Diagnostics.Debug.WriteLine("Verification Email" + verify.GetString(5));
+
+                    SqlCommand sqlCommand = new SqlCommand("NewPassword", sqlconnection);
+                    sqlCommand.Parameters.AddWithValue("@UserName", obj.UserName);
+                    sqlCommand.Parameters.AddWithValue("@Password", obj.ConfirmPassword);
+                    sqlCommand.Parameters.AddWithValue("@Email", obj.Email);
+                    sqlCommand.Parameters.AddWithValue("@FirstName", obj.Name);
+                    sqlCommand.CommandType = CommandType.StoredProcedure;
+                    sqlconnection.Close();
+                    sqlconnection.Open();
                 var reader = sqlCommand.ExecuteReader();
-                reader.Read();
-            
-                return RedirectToAction("Logout");
+                    reader.Read();
+                    sqlconnection.Close();
+                    FormsAuthentication.SignOut();
+                    Session.Clear();
+                    return RedirectToAction("Login", new {shout = "Password Setup was sucessful.", color = "text-success " });
+                    
+
+                /*}*/
+               /* catch 
+                {
+                    System.Diagnostics.Debug.WriteLine("Input combination does not return a row.");
+                    
+                    return RedirectToAction("InitialLogin", new { initialLoginShout = initialLoginShout });
+                }*/
             }
-            return View();
+
+            return RedirectToAction("InitialLogin", new { initialLoginShout = initialLoginShout });
         }
         public ActionResult SendPasswordEmail() 
         {
@@ -155,7 +186,7 @@ namespace UMSV3.Controllers
         }
         [HttpPost]
         /*[ValidateAntiForgeryToken]*/
-        public ActionResult SendPasswordEmail([Bind(Include ="UserName,Name,Email,Name,Email ")] EmailPasswordReset obj )
+        public ActionResult SendPasswordEmail([Bind(Include ="UserName,Name,Email")] EmailPasswordReset obj )
         {
             if (ModelState.IsValid) 
             {
