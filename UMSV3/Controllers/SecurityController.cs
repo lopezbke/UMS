@@ -151,9 +151,9 @@ namespace UMSV3.Controllers
 
                     var verify = sqlCommand2.ExecuteReader();
                     verify.Read();
-                    System.Diagnostics.Debug.WriteLine("Verification UserName: " + verify.GetString(2));
-                    System.Diagnostics.Debug.WriteLine("Verification First Name: " + verify.GetString(3));
-                    System.Diagnostics.Debug.WriteLine("Verification Email: " + verify.GetString(5));
+                    System.Diagnostics.Debug.WriteLine("Verification UserName: " + verify.GetString(1));
+                    System.Diagnostics.Debug.WriteLine("Verification First Name: " + verify.GetString(2));
+                    System.Diagnostics.Debug.WriteLine("Verification Email: " + verify.GetString(4));
 
                     SqlCommand sqlCommand = new SqlCommand("NewPassword", sqlconnection);
                     sqlCommand.Parameters.AddWithValue("@UserName", obj.UserName);
@@ -182,48 +182,74 @@ namespace UMSV3.Controllers
 
             return RedirectToAction("InitialLogin", new { initialLoginShout = initialLoginShout });
         }
-        public ActionResult SendPasswordEmail() 
+        public ActionResult SendPasswordEmail(string ForgotPassShout) 
         {
+            ViewBag.ForgotPassShout = ForgotPassShout;
             return View();
         }
         [HttpPost]
         /*[ValidateAntiForgeryToken]*/
         public ActionResult SendPasswordEmail([Bind(Include ="UserName,Name,Email")] EmailPasswordReset obj )
         {
+            string ForgotPassShout = "One or more fields are invalid.";
             if (ModelState.IsValid) 
             {
                 
                 SqlConnection sqlconnection = new SqlConnection(ConfigurationManager.ConnectionStrings["UMS"].ConnectionString);
-                SqlCommand sqlCommand = new SqlCommand("NewPassword", sqlconnection);
-                SqlCommand sqlCommand2 = new SqlCommand("EmailIntoDb", sqlconnection);
+                try
+                {
+                    SqlCommand sqlCommand = new SqlCommand("NewPassword", sqlconnection);
+                    SqlCommand sqlCommand2 = new SqlCommand("EmailIntoDb", sqlconnection);
+                    SqlCommand sqlCommand3 = new SqlCommand("FormConfirm", sqlconnection);
+                    //Verify
+                    sqlCommand3.Parameters.AddWithValue("@UserName", obj.UserName);
+                    sqlCommand3.Parameters.AddWithValue("@FirstName", obj.Name);
+                    sqlCommand3.Parameters.AddWithValue("@Email", obj.Email);
+
+                    //Password Reset: Where UserName, FirstName and Email matches the input given.
+                    sqlCommand.Parameters.AddWithValue("@UserName", obj.UserName);
+                    sqlCommand.Parameters.AddWithValue("@Password", "Welcome12");
+                    sqlCommand.Parameters.AddWithValue("@Email", obj.Email);
+                    sqlCommand.Parameters.AddWithValue("@FirstName", obj.Name);
+                    //Adds a new row to the EmailsTable with the parameters given.
+                    sqlCommand2.Parameters.AddWithValue("@UserName", obj.UserName);
+                    sqlCommand2.Parameters.AddWithValue("@Name", obj.Name);
+                    sqlCommand2.Parameters.AddWithValue("@Email", obj.Email);
+                    sqlCommand2.Parameters.AddWithValue("@bool", false);
+
+                    sqlCommand3.CommandType = CommandType.StoredProcedure;
+                    sqlCommand.CommandType = CommandType.StoredProcedure;
+                    sqlCommand2.CommandType = CommandType.StoredProcedure;
+
+                    sqlconnection.Open();
+                    var verify = sqlCommand3.ExecuteReader();
+                    verify.Read();
+                    System.Diagnostics.Debug.WriteLine("Verification UserName: " + verify.GetString(1));
+                    System.Diagnostics.Debug.WriteLine("Verification First Name: " + verify.GetString(2));
+                    System.Diagnostics.Debug.WriteLine("Verification Email: " + verify.GetString(4));
+                    sqlconnection.Close();
+
+                    sqlconnection.Open();
+                    sqlCommand.ExecuteReader();
+                    sqlconnection.Close();
+
+                    sqlconnection.Open();
+                    sqlCommand2.ExecuteReader();
+                    sqlconnection.Close();
+
+                    FormsAuthentication.SignOut();
+                    Session.Clear();
+                    return RedirectToAction("Login", new { shout = "Please check your email to see temporary password.", color = "text-success " });
+                }
+                catch 
+                {
+                    System.Diagnostics.Debug.WriteLine("Input combination does not return a row.");
+                    return RedirectToAction("SendPasswordEmail", new { ForgotPassShout = ForgotPassShout });
+                }
                 
-                //Password Reset: Where UserName, FirstName and Email matches the input given.
-                sqlCommand.Parameters.AddWithValue("@UserName", obj.UserName);
-                sqlCommand.Parameters.AddWithValue("@Password", "Welcome12");
-                sqlCommand.Parameters.AddWithValue("@Email", obj.Email);
-                sqlCommand.Parameters.AddWithValue("@FirstName", obj.Name);
-                //Adds a new row to the EmailsTable with the parameters given.
-                sqlCommand2.Parameters.AddWithValue("@UserName", obj.UserName);
-                sqlCommand2.Parameters.AddWithValue("@Name", obj.Name);
-                sqlCommand2.Parameters.AddWithValue("@Email", obj.Email);
-                sqlCommand2.Parameters.AddWithValue("@bool", false);
-
-
-                sqlCommand.CommandType = CommandType.StoredProcedure;
-                sqlCommand2.CommandType = CommandType.StoredProcedure;
-
-                sqlconnection.Open();
-                sqlCommand.ExecuteReader();
-                sqlconnection.Close();
-
-                sqlconnection.Open();
-                sqlCommand2.ExecuteReader();
-                sqlconnection.Close();
-                
-                return RedirectToAction("Logout");
             }
 
-            return View();
+            return RedirectToAction("SendPasswordEmai", new { ForgotPassShout = ForgotPassShout });
         }
     }
 }

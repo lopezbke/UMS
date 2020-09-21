@@ -30,7 +30,9 @@ namespace UMSV3.Controllers
         [HttpPost]
         public ActionResult Index(string obj)
         {
-            var userInfoes = db.UserInfoes.Include(u => u.Role).Include(u => u.Status).Include(u => u.UserCredential).Where(u => u.FirstName == obj);
+            var userInfoes = db.UserInfoes.Include(u => u.Role).Include(u => u.Status).Include(u => u.UserCredential).Where(
+                u => u.FirstName == obj || u.UserName == obj || u.LastName == obj || u.Email == obj || u.C_Address == obj || u.City == obj || u.Country == obj
+                || u.PhoneNumber == obj );
             return View(userInfoes);
         }
         // GET: UserInfo/Details/5
