@@ -54,44 +54,48 @@ namespace UMSV3.Controllers
                     string role = Convert.ToString(reader["RoleId"]);
                     string password = Convert.ToString(reader["Password"]);
                     string status = Convert.ToString(reader["StatusId"]);
-
-                    FormsAuthentication.SetAuthCookie(userId, false);
-                    Session.Add("UserId", userId);
-                    FormsAuthentication.SetAuthCookie(username, false);
-                    Session.Add("UserName", username);
-                    FormsAuthentication.SetAuthCookie(password, false);
-                    Session.Add("Password", password);
-                    FormsAuthentication.SetAuthCookie(Convert.ToString(status), false);
-                    Session.Add("Status", status);
-                    FormsAuthentication.SetAuthCookie(Convert.ToString(role), false);
-                    Session.Add("Role", role);
-                    System.Diagnostics.Debug.WriteLine("Account Found");
-
-                    System.Diagnostics.Debug.WriteLine(Session["UserId"]);
-                    System.Diagnostics.Debug.WriteLine(Session["Role"]);
-                    System.Diagnostics.Debug.WriteLine(Session["Status"]);
-                    System.Diagnostics.Debug.WriteLine(Session["Password"]);
-                    System.Diagnostics.Debug.WriteLine(Session["UserName"]);
-
-                    if (Session["Password"].ToString() == "Welcome12")
+                    if (status == "1")
                     {
-                        return RedirectToAction("InitialLogin");
+                        FormsAuthentication.SetAuthCookie(userId, false);
+                        Session.Add("UserId", userId);
+                        FormsAuthentication.SetAuthCookie(username, false);
+                        Session.Add("UserName", username);
+                        FormsAuthentication.SetAuthCookie(password, false);
+                        Session.Add("Password", password);
+                        FormsAuthentication.SetAuthCookie(Convert.ToString(status), false);
+                        Session.Add("Status", status);
+                        FormsAuthentication.SetAuthCookie(Convert.ToString(role), false);
+                        Session.Add("Role", role);
+
+
+                        System.Diagnostics.Debug.WriteLine(Session["UserId"]);
+                        System.Diagnostics.Debug.WriteLine(Session["Role"]);
+                        System.Diagnostics.Debug.WriteLine(Session["Status"]);
+                        System.Diagnostics.Debug.WriteLine(Session["Password"]);
+                        System.Diagnostics.Debug.WriteLine(Session["UserName"]);
+
+                        if (Session["Password"].ToString() == "Welcome12")
+                        {
+                            return RedirectToAction("InitialLogin");
+                        }
                     }
+                    else 
+                    {
+                        System.Diagnostics.Debug.WriteLine(Session["Status"]);
+                        string shout = "Account is currently inactive, please contact admin at admin@UMS.com ";
+                        return RedirectToAction("Login", new { shout = shout });
+
+                    }
+                   
                 }
                 catch 
                 {
                     System.Diagnostics.Debug.WriteLine("No combination of that UserName and Password found.");
-                    string shout = "No combination of that UserName and Password found.";
+                    string shout = "Invalid Credentials, please try again.";
                     /*ViewBag.Shout = "No combination of that UserName and Password found.";*/
                     return RedirectToAction("Login", new { shout = shout });
                 }
-               /* if (reader.Read())
-                {
-                    System.Diagnostics.Debug.WriteLine("No combination of that UserName and Password found.");
-                    string shout = "No combination of that UserName and Password found.";
-                    *//*ViewBag.Shout = "No combination of that UserName and Password found.";*//*
-                    return RedirectToAction("Login", new { shout = shout });
-                }*/
+              
 
             }
 
@@ -155,15 +159,17 @@ namespace UMSV3.Controllers
         {
             if (ModelState.IsValid) 
             {
-                //Reset the Password
+                
                 SqlConnection sqlconnection = new SqlConnection(ConfigurationManager.ConnectionStrings["UMS"].ConnectionString);
                 SqlCommand sqlCommand = new SqlCommand("NewPassword", sqlconnection);
                 SqlCommand sqlCommand2 = new SqlCommand("EmailIntoDb", sqlconnection);
-
+                
+                //Password Reset: Where UserName, FirstName and Email matches the input given.
                 sqlCommand.Parameters.AddWithValue("@UserName", obj.UserName);
                 sqlCommand.Parameters.AddWithValue("@Password", "Welcome12");
                 sqlCommand.Parameters.AddWithValue("@Email", obj.Email);
                 sqlCommand.Parameters.AddWithValue("@FirstName", obj.Name);
+                //Adds a new row to the EmailsTable with the parameters given.
                 sqlCommand2.Parameters.AddWithValue("@UserName", obj.UserName);
                 sqlCommand2.Parameters.AddWithValue("@Name", obj.Name);
                 sqlCommand2.Parameters.AddWithValue("@Email", obj.Email);
