@@ -146,9 +146,7 @@ namespace UMSV3.Controllers
             {
                 db.Entry(userInfo).State = EntityState.Modified;
                 db.SaveChanges();
-                
-
-
+               
                 //Image Upload
                
             }
@@ -156,7 +154,7 @@ namespace UMSV3.Controllers
             ViewBag.StatusId = new SelectList(db.Status, "StatusId", "StatusName", userInfo.StatusId);
             ViewBag.UserId = new SelectList(db.UserCredentials, "UserId", "Password", userInfo.UserId);
 
-            return View(userInfo);
+            return RedirectToAction("Index");
         }
 
         // GET: UserInfo/Delete/5
