@@ -61,8 +61,10 @@ namespace UMSV3.Models
         [DisplayName("Role")]
         public Nullable<int> RoleId { get; set; }
 
-       /* public HttpPostedFileBase fileUpload { get; set; }*/
-        
+        public HttpPostedFileBase fileUpload { get; set; }
+
+        public byte[] imageBuffer { get; set; }
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ProfilePicture> ProfilePictures { get; set; }
         public virtual Role Role { get; set; }

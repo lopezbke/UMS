@@ -12,6 +12,8 @@ using System.Data.SqlClient;
 using System.Configuration;
 using Microsoft.Ajax.Utilities;
 using System.IO;
+using System.Drawing;
+
 namespace UMSV3.Controllers
 {
     [Authorize]
@@ -19,6 +21,33 @@ namespace UMSV3.Controllers
     {
         private UMSEntities db = new UMSEntities();
 
+        public String GetImage(int userId)
+        {
+            SqlConnection sqlConnection = new SqlConnection(ConfigurationManager.ConnectionStrings["UMS"].ConnectionString);
+            SqlCommand sqlCommand = new SqlCommand("GetFromImageBank", sqlConnection);
+            sqlCommand.CommandType = CommandType.StoredProcedure;
+            sqlCommand.Parameters.AddWithValue("@UserId", userId);
+            sqlConnection.Open();
+            var reader = sqlCommand.ExecuteReader();
+            reader.Read();
+
+            var image = reader["ImageData"];
+            var imageType = reader["ImageType"];
+            byte[] imageAsBytes = (byte[])image;
+
+            /* for (int i = 0; i < image2.Length; i++)
+             {
+
+                 System.Diagnostics.Debug.WriteLine(image2[i]);
+
+             }*/
+            var a = System.Convert.ToBase64String(imageAsBytes);
+            System.Diagnostics.Debug.WriteLine(a);
+            sqlConnection.Close();
+
+
+            return a;
+        }
         // GET: UserInfo
         public ActionResult Index()
         {
@@ -35,6 +64,13 @@ namespace UMSV3.Controllers
                 || u.PhoneNumber == obj );
             return View(userInfoes);
         }
+        private static Image BinaryToImage(byte[] binaryData)
+        {
+            MemoryStream ms = new MemoryStream(binaryData);
+            Image img = Image.FromStream(ms);
+            return img;
+        }
+        
         // GET: UserInfo/Details/5
         public ActionResult Details(int? id)
         {
@@ -47,8 +83,18 @@ namespace UMSV3.Controllers
             {
                 return HttpNotFound();
             }
+           
+            /*ImageConverter converter = new ImageConverter();
+            ViewBag.Image = (byte[])converter.ConvertTo(x, typeof(byte[]));*/
+            /*userInfo.imageBuffer= (byte[])converter.ConvertTo(x, typeof(byte[]));*/
+
+            /*System.Diagnostics.Debug.WriteLine(x);*/
+           /* BinaryToImage(x);*/
+            
             return View(userInfo);
         }
+
+      
 
         // GET: UserInfo/Create
         public ActionResult Create()
@@ -119,6 +165,8 @@ namespace UMSV3.Controllers
         // GET: UserInfo/Edit/5
         public ActionResult Edit(int? id)
         {
+            string b = GetImage(id.Value);
+            ViewBag.Image = b;
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
@@ -140,15 +188,27 @@ namespace UMSV3.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "UserId,UserName,FirstName,LastName,Email,C_Address,City,Country,ZipCode,PhoneNumber,StatusId,RoleId")] UserInfo userInfo)
+        public ActionResult Edit([Bind(Include = "UserId,UserName,FirstName,LastName,Email,C_Address,City,Country,ZipCode,PhoneNumber,StatusId,RoleId, fileUpload")] UserInfo userInfo, HttpPostedFileBase fileUpload)
         {
             if (ModelState.IsValid)
             {
                 db.Entry(userInfo).State = EntityState.Modified;
                 db.SaveChanges();
-               
+
                 //Image Upload
-               
+                System.Diagnostics.Debug.WriteLine(fileUpload.FileName);
+                SqlConnection sqlConnection = new SqlConnection(ConfigurationManager.ConnectionStrings["UMS"].ConnectionString);
+                SqlCommand sqlCommand = new SqlCommand("SaveImage", sqlConnection);
+
+                sqlCommand.CommandType = CommandType.StoredProcedure;
+
+                //sqlCommand.Parameters.
+                sqlCommand.Parameters.AddWithValue("@UserId",userInfo.UserId);
+                sqlCommand.Parameters.AddWithValue("@ImageData", fileUpload.InputStream);
+                sqlConnection.Open();
+                sqlCommand.ExecuteReader();
+                sqlConnection.Close();
+
             }
             ViewBag.RoleId = new SelectList(db.Roles, "RoleId", "RoleName", userInfo.RoleId);
             ViewBag.StatusId = new SelectList(db.Status, "StatusId", "StatusName", userInfo.StatusId);
