@@ -21,32 +21,42 @@ namespace UMSV3.Controllers
     {
         private UMSEntities db = new UMSEntities();
 
-        public String GetImage(int userId)
+        public string GetImage(int userId)
         {
-            SqlConnection sqlConnection = new SqlConnection(ConfigurationManager.ConnectionStrings["UMS"].ConnectionString);
-            SqlCommand sqlCommand = new SqlCommand("GetFromImageBank", sqlConnection);
-            sqlCommand.CommandType = CommandType.StoredProcedure;
-            sqlCommand.Parameters.AddWithValue("@UserId", userId);
-            sqlConnection.Open();
-            var reader = sqlCommand.ExecuteReader();
-            reader.Read();
+            try 
+            {
+                SqlConnection sqlConnection = new SqlConnection(ConfigurationManager.ConnectionStrings["UMS"].ConnectionString);
+                SqlCommand sqlCommand = new SqlCommand("GetFromImageBank", sqlConnection);
+                sqlCommand.CommandType = CommandType.StoredProcedure;
+                sqlCommand.Parameters.AddWithValue("@UserId", userId);
+                sqlConnection.Open();
+                var reader = sqlCommand.ExecuteReader();
+                reader.Read();
 
-            var image = reader["ImageData"];
-            var imageType = reader["ImageType"];
-            byte[] imageAsBytes = (byte[])image;
+                var image = reader["ImageData"];
+                string imageType = reader.GetString(3);
+                byte[] imageAsBytes = (byte[])image;
 
-            /* for (int i = 0; i < image2.Length; i++)
-             {
+                /* for (int i = 0; i < image2.Length; i++)
+                 {
 
-                 System.Diagnostics.Debug.WriteLine(image2[i]);
+                     System.Diagnostics.Debug.WriteLine(image2[i]);
 
-             }*/
-            var a = System.Convert.ToBase64String(imageAsBytes);
-            System.Diagnostics.Debug.WriteLine(a);
-            sqlConnection.Close();
+                 }*/
+                var a = System.Convert.ToBase64String(imageAsBytes);
+                System.Diagnostics.Debug.WriteLine(imageType);
+                System.Diagnostics.Debug.WriteLine(a);
+                string imgSource = "data:" + imageType + ";base64," + a; 
+                sqlConnection.Close();
 
 
-            return a;
+                return imgSource;
+            } 
+            catch 
+            { 
+                System.Diagnostics.Debug.WriteLine("Exception found.");
+            }
+            return "";
         }
         // GET: UserInfo
         public ActionResult Index()
@@ -74,6 +84,8 @@ namespace UMSV3.Controllers
         // GET: UserInfo/Details/5
         public ActionResult Details(int? id)
         {
+            string imgSource = GetImage(id.Value);
+            ViewBag.Image = imgSource;
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
@@ -165,8 +177,8 @@ namespace UMSV3.Controllers
         // GET: UserInfo/Edit/5
         public ActionResult Edit(int? id)
         {
-            string b = GetImage(id.Value);
-            ViewBag.Image = b;
+            string imgSource = GetImage(id.Value);
+            ViewBag.Image = imgSource;
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
@@ -194,21 +206,47 @@ namespace UMSV3.Controllers
             {
                 db.Entry(userInfo).State = EntityState.Modified;
                 db.SaveChanges();
-
-                //Image Upload
-                System.Diagnostics.Debug.WriteLine(fileUpload.FileName);
                 SqlConnection sqlConnection = new SqlConnection(ConfigurationManager.ConnectionStrings["UMS"].ConnectionString);
-                SqlCommand sqlCommand = new SqlCommand("SaveImage", sqlConnection);
+                var check = GetImage(userInfo.UserId);
+                if (check != "" && fileUpload != null) 
+                {
+                    System.Diagnostics.Debug.WriteLine("Some image found run the delete query");
+                    //Delete Current Image
+                    SqlCommand sqlCommandDel = new SqlCommand("DeleteOnImageBank", sqlConnection);
+                    sqlCommandDel.CommandType = CommandType.StoredProcedure;
+                    sqlCommandDel.Parameters.AddWithValue("@UserId", userInfo.UserId);
+                    sqlConnection.Open();
+                    sqlCommandDel.ExecuteReader();
+                    sqlConnection.Close();
+                    //Now add the new image
+                    SqlCommand sqlCommand = new SqlCommand("SaveImage", sqlConnection);
 
-                sqlCommand.CommandType = CommandType.StoredProcedure;
+                    sqlCommand.CommandType = CommandType.StoredProcedure;
 
-                //sqlCommand.Parameters.
-                sqlCommand.Parameters.AddWithValue("@UserId",userInfo.UserId);
-                sqlCommand.Parameters.AddWithValue("@ImageData", fileUpload.InputStream);
-                sqlConnection.Open();
-                sqlCommand.ExecuteReader();
-                sqlConnection.Close();
+                    //sqlCommand.Parameters.
+                    sqlCommand.Parameters.AddWithValue("@UserId", userInfo.UserId);
+                    sqlCommand.Parameters.AddWithValue("@ImageData", fileUpload.InputStream);
+                    sqlCommand.Parameters.AddWithValue("@ImageType", fileUpload.ContentType);
+                    sqlConnection.Open();
+                    sqlCommand.ExecuteReader();
+                    sqlConnection.Close();
+                }
+                if (check == "" && fileUpload != null) 
+                {
+                    //Image Upload
+                    SqlCommand sqlCommand = new SqlCommand("SaveImage", sqlConnection);
 
+                    sqlCommand.CommandType = CommandType.StoredProcedure;
+
+                    //sqlCommand.Parameters.
+                    sqlCommand.Parameters.AddWithValue("@UserId", userInfo.UserId);
+                    sqlCommand.Parameters.AddWithValue("@ImageData", fileUpload.InputStream);
+                    sqlCommand.Parameters.AddWithValue("@ImageType", fileUpload.ContentType);
+                    sqlConnection.Open();
+                    sqlCommand.ExecuteReader();
+                    sqlConnection.Close();
+                }
+                
             }
             ViewBag.RoleId = new SelectList(db.Roles, "RoleId", "RoleName", userInfo.RoleId);
             ViewBag.StatusId = new SelectList(db.Status, "StatusId", "StatusName", userInfo.StatusId);

@@ -249,7 +249,7 @@ namespace UMSV3.Controllers
                 
             }
 
-            return RedirectToAction("SendPasswordEmai", new { ForgotPassShout = ForgotPassShout });
+            return RedirectToAction("SendPasswordEmail", new { ForgotPassShout = ForgotPassShout });
         }
     }
 }

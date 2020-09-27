@@ -9,10 +9,10 @@
 <div>
     <h4>User Information</h4>
     <hr />
+    <div class="form-group" style="margin-left:6em;">
+        <img src="@ViewBag.Image" width="100" />
+    </div>
     <dl class="dl-horizontal">
-        <dt>
-            @*<img src="@Url.Action('BinaryToImage(image2)')"/>*@
-        </dt>
         <dt>
             @Html.DisplayNameFor(model => model.UserName)
         </dt>
