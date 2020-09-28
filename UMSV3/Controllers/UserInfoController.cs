@@ -22,7 +22,7 @@ namespace UMSV3.Controllers
     {
         private UMSEntities db = new UMSEntities();
 
-        public string GetImage(int userId)
+        public static string GetImage(int userId)
         {
             try 
             {
@@ -60,10 +60,12 @@ namespace UMSV3.Controllers
             return "";
         }
         // GET: UserInfo
-        public ActionResult Index(string a,string color)
+        public ActionResult Index(string a, string color, string emailStatus)
         {
+
             ViewBag.ExcelExport = a;
             ViewBag.Color = color;
+            ViewBag.EmailStatus = emailStatus;
             var userInfoes = db.UserInfoes.Include(u => u.Role).Include(u => u.Status).Include(u => u.UserCredential);
             
             return View(userInfoes.ToList());
@@ -78,9 +80,12 @@ namespace UMSV3.Controllers
             return View(userInfoes);
         }
         [HttpPost]
-        public ActionResult ExportToExcel(string fileName) 
+        public ActionResult ExportToExcel(string fileName,string OpenAtDownload, string sendEmailTo) 
         {
-            if (fileName == "") { fileName = "UserList"; }
+            
+            System.Diagnostics.Debug.WriteLine("Is it empty: " + fileName.IsNullOrWhiteSpace());
+            if (fileName == "" || fileName.IsNullOrWhiteSpace() == true) { fileName = "UserList"; }
+            System.Diagnostics.Debug.WriteLine(fileName);
             Microsoft.Office.Interop.Excel.Workbook ExcelWorkBook;
             Microsoft.Office.Interop.Excel.Worksheet ExcelWorkSheet;
             object misValue = System.Reflection.Missing.Value;
@@ -138,29 +143,52 @@ namespace UMSV3.Controllers
                 row++;
             }
             ExcelWorkSheet.Columns.AutoFit();
+            string isEmailSend = "";
             try
             {
-                ExcelWorkBook.SaveAs($"{fileName}.xls", Microsoft.Office.Interop.Excel.XlFileFormat.xlWorkbookNormal, misValue, misValue, misValue, misValue, Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive, misValue, misValue, misValue, misValue, misValue);
-                ExcelWorkBook.SendMail("klopez184@outlook.com","User List From the User Management System");
+                ExcelWorkBook.SaveAs(fileName, Microsoft.Office.Interop.Excel.XlFileFormat.xlWorkbookNormal, misValue, misValue, misValue, misValue, Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive, misValue, misValue, misValue, misValue, misValue);
                
-                System.Diagnostics.Process.Start($"E:/Documents/{fileName}.xls");
+                if (sendEmailTo.IsNullOrWhiteSpace() == false)
+                {
+                    try 
+                    { 
+                        ExcelWorkBook.SendMail(sendEmailTo, "User List From the User Management System");
+                        isEmailSend = "Email was sent.";
+                    } 
+                    catch 
+                    {
+                        isEmailSend = "Email was not sent.";
+                    }
+                    
+                }
+               
+                if (OpenAtDownload == "true") { System.Diagnostics.Process.Start($"E:/Documents/{fileName}.xls"); }
                 /*ExcelWorkBook.WebPagePreview();*/
                 ExcelWorkBook.Close(true, misValue, misValue);
-                ExcelExport.Quit();
                 
-
+                ExcelExport.Quit();
+               
                 Marshal.ReleaseComObject(ExcelWorkSheet);
                 Marshal.ReleaseComObject(ExcelWorkBook);
                 Marshal.ReleaseComObject(ExcelExport);
 
-                return RedirectToAction("Index", new { a = "Excel Document was created sucessfully and it should be available in your Documents folder.", color = "green" });
+                return RedirectToAction("Index", new { a = "Excel Document was created sucessfully and it should be available in your Documents folder.", color = "green", emailStatus = isEmailSend });
             }
             catch 
             {
-                 System.Diagnostics.Debug.WriteLine("Excel Document was not created.");
-                 return RedirectToAction("Index", new { a = "Excel Document was not created.", color = "red" });
+                ExcelWorkBook.Close(true, misValue, misValue);
+                
+                ExcelExport.Quit();
+
+
+                Marshal.ReleaseComObject(ExcelWorkSheet);
+                Marshal.ReleaseComObject(ExcelWorkBook);
+                Marshal.ReleaseComObject(ExcelExport);
+                
+                System.Diagnostics.Debug.WriteLine("Excel Document was not created.");
+                 return RedirectToAction("Index", new { a = "Excel Document was not created.", color = "red", emailStatus = isEmailSend });
             }
-            
+
         }
         /*private static Image BinaryToImage(byte[] binaryData)
         {

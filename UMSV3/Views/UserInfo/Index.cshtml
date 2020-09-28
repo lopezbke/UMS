@@ -24,7 +24,7 @@
 @{
     string c = Convert.ToString(Session["Role"]);
     if (c == "1")
-    {   
+    {
     <div style="margin-bottom:.5em;font-weight:bolder;width:9em;text-decoration:underline;">
         <a href="userinfo/Create" style="font-weight:bold;display:inline;color:black;">Create New User</a>
         @*@Html.ActionLink("Create New User", "Create")*@
@@ -35,6 +35,9 @@
                 }
 <table class="table jumbotron"style="background-color:white;">
     <tr style="background-color:dodgerblue;">
+        <th>
+         Photo
+        </th>
         <th>
             @Html.DisplayNameFor(model => model.UserName)
         </th>
@@ -77,6 +80,13 @@
     @foreach (var item in Model)
     {
         <tr>
+            <td>
+                @{
+                    string imgSource = UMSV3.Controllers.UserInfoController.GetImage(item.UserId);
+                    <img src="@imgSource" width="50"/>
+
+                }
+            </td>
             <td>
                 @Html.DisplayFor(modelItem => item.UserName)
             </td>
@@ -131,19 +141,20 @@
             }
         </td>
         </tr>
-    }
+                }
 
 </table>
 
-<p style="color:@ViewBag.color;"><i>@ViewBag.ExcelExport</i></p>
-<form method="post" action="UserInfo/ExportToExcel">
+<p style="color:@ViewBag.Color;"><i>@ViewBag.ExcelExport</i></p>
+<p class="text-warning"><i>@ViewBag.EmailStatus</i></p>
+<form method="post" action="userinfo/ExportToExcel">
     <div class="form-group jumbotron" style="background-color:white;">
         <label for="fileName">FileName:</label>
         <input type="text" class="form-control" placeholder=" Enter FileName" name="fileName" id="fileName" style="margin-bottom:10px;" />
 
-        <label for="fileName">Send Email To:</label>
+        <label for="sendEmailTo">Send Email To:</label>
         <span class="text-warning">(Optional)</span>
-        <input type="text" class="form-control" placeholder=" user@outlook.com" name="fileName" id="fileName" style="margin-bottom:10px;" />
+        <input type="text" class="form-control" placeholder=" user@outlook.com" name="sendEmailTo" id="SendEmailTo" style="margin-bottom:10px;" />
         @*<div class="form-check">
             <input type="checkbox" value="true" id="SendEmailCheckBox" name="SendEmailCheckBox" class="form-check-input" />
             <label for="SendEmailCheckBox" class="form-check-label">Send Email</label>
@@ -151,7 +162,7 @@
 
         <div class="form-check">
             <input type="checkbox" value="true" name="OpenAtDownload" id="OpenAtDownload" class="form-check-input" />
-            <label for="OpenAtDownload" class="form-check-label">Open Excel Sheet after download</label>
+            <label for="OpenAtDownload" class="form-check-label">Open Excel Document after download</label>
         </div>
 
         <div>
