@@ -13,37 +13,72 @@
         ViewBag.TypeOfUser = "Admin View";
     }
 }
+<script>
+    function ChangePicture()
+    {
+        
+        if (document.getElementById("theImage").style.display === "none") {
+            x = document.getElementsByTagName("img");
+            var i;
+            for (i = 0; i < x.length; i++) {
+                x[i].style.display = "block";
+            }
+        } else
+        {
+            x = document.getElementsByTagName("img");
+            var i;
+            for (i = 0; i < x.length; i++) {
+                x[i].style.display = "none";
+            }
+        }
+        
 
+    }
+</script>
 <h2>@ViewBag.TypeOfUser</h2>
 <form method="post" action="">
     <div class="form-group">
-        <input type="text" class="form-control" placeholder="Filter" name="obj" id="obj" style="display:inline;"/>
+        <input type="text" class="form-control" placeholder="Filter" name="obj" id="obj" style="display:inline;" />
         <button class="btn"><a href="" style="font-weight:bold;display:inline;color:black;">Show All</a></button>
     </div>
 </form>
-@{
-    string c = Convert.ToString(Session["Role"]);
-    if (c == "1")
-    {
-    <div style="margin-bottom:.5em;font-weight:bolder;width:9em;text-decoration:underline;">
-        <a href="userinfo/Create" style="font-weight:bold;display:inline;color:black;">Create New User</a>
-        @*@Html.ActionLink("Create New User", "Create")*@
-    </div>
+<table width="100%">
+    <tr>
+        <th width="90%">
+            @{
+                string c = Convert.ToString(Session["Role"]);
+                if (c == "1")
+                {
+
+                    <div style="margin-bottom:.5em;font-weight:bolder;width:9em;text-decoration:underline;">
+
+                        <a href="userinfo/Create" style="font-weight:bold;color:black;">Create New User</a>
+                        @*@Html.ActionLink("Create New User", "Create")*@
+                    </div>
 
 
-    }
-@*<form method="post" action="">
-    <div class="form-check">
-        <input type="radio" value="true" name="ShowPictures" id="ShowPictures" class="form-check-input" />
-        <label for="Show Pictures" class="form-check-label">Show Pictures?</label>
-        <button class="btn" type="submit">Confirm</button>
-    </div>
-</form>*@
                 }
-<table class="table jumbotron"style="background-color:white;">
+
+
+                @*<form method="post" action="">
+                <div class="form-check">
+                    <input type="radio" value="true" name="ShowPictures" id="ShowPictures" class="form-check-input" />
+                    <label for="Show Pictures" class="form-check-label">Show Pictures?</label>
+                    <button class="btn" type="submit">Confirm</button>
+                </div>
+            </form>*@
+            }
+        </th>
+        <th>
+            <button class="btn btn-primary" style="margin-bottom: .5em;" onclick="ChangePicture();">Toggle Pictures</button>
+        </th>
+    </tr>
+</table>
+
+<table class="table jumbotron" style="background-color:white;">
     <tr style="background-color:dodgerblue;">
         <th>
-         Photo
+            Photo
         </th>
         <th>
             @Html.DisplayNameFor(model => model.UserName)
@@ -89,11 +124,11 @@
         <tr>
             <td>
                 @{
-                   @* if (ViewBag.ShowPictures == "true")
-                    {*@
-                        string imgSource = UMSV3.Controllers.UserInfoController.GetImage(item.UserId);
-                        <img src="@imgSource" width="50" /> 
-                   @* }*@
+                    @* if (ViewBag.ShowPictures == "true")
+                        {*@
+                    string imgSource = UMSV3.Controllers.UserInfoController.GetImage(item.UserId);
+                    <img src="@imgSource" width="50" id="theImage" style="display:none;" />
+                    @* }*@
                 }
             </td>
             <td>
@@ -132,25 +167,25 @@
             @*<td>
                     @Html.DisplayFor(modelItem => item.UserCredential.Password)
                 </td>*@
-        <td>
-            @Html.ActionLink("Details ", "Details", new { id = item.UserId })
-            @{ string a = Convert.ToString(Session["Role"]);
+            <td>
+                @Html.ActionLink("Details ", "Details", new { id = item.UserId })
+                @{ string a = Convert.ToString(Session["Role"]);
 
-                if (a == "1" || Convert.ToUInt32(Session["UserId"]) == item.UserId)
-                {
-                    @Html.ActionLink("Edit ", "Edit", new { id = item.UserId })
+                    if (a == "1" || Convert.ToUInt32(Session["UserId"]) == item.UserId)
+                    {
+                        @Html.ActionLink("Edit ", "Edit", new { id = item.UserId })
+                    }
+
+
+                    if (a == "1" && Convert.ToInt32(Session["UserId"]) != item.UserId)
+                    {
+                        @Html.ActionLink("Delete", "Delete", new { id = item.UserId })
+
+                    }
                 }
-
-
-                if (a == "1" && Convert.ToInt32(Session["UserId"]) != item.UserId)
-                {
-                    @Html.ActionLink("Delete", "Delete", new { id = item.UserId })
-
-                }
-            }
-        </td>
+            </td>
         </tr>
-                }
+    }
 
 </table>
 
@@ -165,14 +200,14 @@
         <span class="text-warning">(Optional)</span>
         <input type="text" class="form-control" placeholder=" user@outlook.com" name="sendEmailTo" id="SendEmailTo" style="margin-bottom:10px;" />
         @*<div class="form-check">
-            <input type="checkbox" value="true" id="SendEmailCheckBox" name="SendEmailCheckBox" class="form-check-input" />
-            <label for="SendEmailCheckBox" class="form-check-label">Send Email</label>
-        </div>*@
+                <input type="checkbox" value="true" id="SendEmailCheckBox" name="SendEmailCheckBox" class="form-check-input" />
+                <label for="SendEmailCheckBox" class="form-check-label">Send Email</label>
+            </div>*@
 
-       @* <div class="form-check">
-            <input type="checkbox" value="true" name="OpenAtDownload" id="OpenAtDownload" class="form-check-input" />
-            <label for="OpenAtDownload" class="form-check-label">View on the web after download</label>
-        </div>*@
+        @* <div class="form-check">
+                <input type="checkbox" value="true" name="OpenAtDownload" id="OpenAtDownload" class="form-check-input" />
+                <label for="OpenAtDownload" class="form-check-label">View on the web after download</label>
+            </div>*@
 
         <div>
             <button style="margin-top:10px;" type="submit" class="btn btn-success">Export to Excel</button>
