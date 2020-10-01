@@ -32,6 +32,13 @@
 
 
     }
+@*<form method="post" action="">
+    <div class="form-check">
+        <input type="radio" value="true" name="ShowPictures" id="ShowPictures" class="form-check-input" />
+        <label for="Show Pictures" class="form-check-label">Show Pictures?</label>
+        <button class="btn" type="submit">Confirm</button>
+    </div>
+</form>*@
                 }
 <table class="table jumbotron"style="background-color:white;">
     <tr style="background-color:dodgerblue;">
@@ -82,9 +89,11 @@
         <tr>
             <td>
                 @{
-                    string imgSource = UMSV3.Controllers.UserInfoController.GetImage(item.UserId);
-                    <img src="@imgSource" width="50"/>
-
+                   @* if (ViewBag.ShowPictures == "true")
+                    {*@
+                        string imgSource = UMSV3.Controllers.UserInfoController.GetImage(item.UserId);
+                        <img src="@imgSource" width="50" /> 
+                   @* }*@
                 }
             </td>
             <td>
@@ -160,10 +169,10 @@
             <label for="SendEmailCheckBox" class="form-check-label">Send Email</label>
         </div>*@
 
-        <div class="form-check">
+       @* <div class="form-check">
             <input type="checkbox" value="true" name="OpenAtDownload" id="OpenAtDownload" class="form-check-input" />
-            <label for="OpenAtDownload" class="form-check-label">Open Excel Document after download</label>
-        </div>
+            <label for="OpenAtDownload" class="form-check-label">View on the web after download</label>
+        </div>*@
 
         <div>
             <button style="margin-top:10px;" type="submit" class="btn btn-success">Export to Excel</button>

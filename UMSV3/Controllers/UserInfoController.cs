@@ -62,7 +62,8 @@ namespace UMSV3.Controllers
         // GET: UserInfo
         public ActionResult Index(string a, string color, string emailStatus)
         {
-
+            /*ViewBag.ShowPictures = "";
+            ViewBag.ShowPictures = ShowPictures;*/
             ViewBag.ExcelExport = a;
             ViewBag.Color = color;
             ViewBag.EmailStatus = emailStatus;
@@ -74,121 +75,24 @@ namespace UMSV3.Controllers
         [HttpPost]
         public ActionResult Index(string obj)
         {
+            
             var userInfoes = db.UserInfoes.Include(u => u.Role).Include(u => u.Status).Include(u => u.UserCredential).Where(
                 u => u.FirstName == obj || u.UserName == obj || u.LastName == obj || u.Email == obj || u.C_Address == obj || u.City == obj || u.Country == obj
                 || u.PhoneNumber == obj );
             return View(userInfoes);
         }
         [HttpPost]
-        public ActionResult ExportToExcel(string fileName,string OpenAtDownload, string sendEmailTo) 
+        public ActionResult ExportToExcel(string fileName, string sendEmailTo) 
         {
-            
-            System.Diagnostics.Debug.WriteLine("Is it empty: " + fileName.IsNullOrWhiteSpace());
-            if (fileName == "" || fileName.IsNullOrWhiteSpace() == true) { fileName = "UserList"; }
-            System.Diagnostics.Debug.WriteLine(fileName);
-            Microsoft.Office.Interop.Excel.Workbook ExcelWorkBook;
-            Microsoft.Office.Interop.Excel.Worksheet ExcelWorkSheet;
-            object misValue = System.Reflection.Missing.Value;
-            Microsoft.Office.Interop.Excel.Application ExcelExport = new Microsoft.Office.Interop.Excel.Application();
-            
-            ExcelWorkBook = ExcelExport.Workbooks.Add(misValue);
-            ExcelWorkSheet = ExcelWorkBook.Worksheets.get_Item(1);
-
-            ExcelWorkSheet.Cells.NumberFormat = "@";
-            var rowColor = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.Yellow);
-
-            ExcelWorkSheet.get_Range("A1", "K1").Interior.Color = rowColor;
-            ExcelWorkSheet.get_Range("A1", "K1").Font.Bold = true;
-            
-
-            ExcelWorkSheet.Cells[1, 1] = "UserName";
-
-            ExcelWorkSheet.Cells[1, 2] = "FirstName";
-
-            ExcelWorkSheet.Cells[1, 3] = "LastName";
-
-            ExcelWorkSheet.Cells[1, 4] = "Email";
-
-            ExcelWorkSheet.Cells[1, 5] = "Address";
-
-            ExcelWorkSheet.Cells[1, 6] = "City";
-
-            ExcelWorkSheet.Cells[1, 7] = "Country";
-
-            ExcelWorkSheet.Cells[1, 8] = "ZipCode";
-
-            ExcelWorkSheet.Cells[1, 9] = "PhoneNumber";
-
-            ExcelWorkSheet.Cells[1, 10] = "Role";
-
-            ExcelWorkSheet.Cells[1, 11] = "Status";
-
-            var userInfoes = db.UserInfoes.Include(u => u.Role).Include(u => u.Status).Include(u => u.UserCredential);
-            userInfoes.ToList();
-            int row = 2;
-            foreach(var item in userInfoes) 
-            {
-
-                ExcelWorkSheet.Cells[row, 1] = item.UserName;
-                ExcelWorkSheet.Cells[row, 2] = item.FirstName;
-                ExcelWorkSheet.Cells[row, 3] = item.LastName;
-                ExcelWorkSheet.Cells[row, 4] = item.Email;
-                ExcelWorkSheet.Cells[row, 5] = item.C_Address;
-                ExcelWorkSheet.Cells[row, 6] = item.City;
-                ExcelWorkSheet.Cells[row, 7] = item.Country;
-                ExcelWorkSheet.Cells[row, 8] = item.ZipCode;
-                ExcelWorkSheet.Cells[row, 9] = item.PhoneNumber;
-                ExcelWorkSheet.Cells[row, 10] = item.Role.RoleName;
-                ExcelWorkSheet.Cells[row, 11] = item.Status.StatusName;
-                row++;
-            }
-            ExcelWorkSheet.Columns.AutoFit();
-            string isEmailSend = "";
-            try
-            {
-                ExcelWorkBook.SaveAs(fileName, Microsoft.Office.Interop.Excel.XlFileFormat.xlWorkbookNormal, misValue, misValue, misValue, misValue, Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive, misValue, misValue, misValue, misValue, misValue);
-               
-                if (sendEmailTo.IsNullOrWhiteSpace() == false)
-                {
-                    try 
-                    { 
-                        ExcelWorkBook.SendMail(sendEmailTo, "User List From the User Management System");
-                        isEmailSend = "Email was sent.";
-                    } 
-                    catch 
-                    {
-                        isEmailSend = "Email was not sent.";
-                    }
-                    
-                }
-               
-                if (OpenAtDownload == "true") { System.Diagnostics.Process.Start($"E:/Documents/{fileName}.xls"); }
-                /*ExcelWorkBook.WebPagePreview();*/
-                ExcelWorkBook.Close(true, misValue, misValue);
-                
-                ExcelExport.Quit();
-               
-                Marshal.ReleaseComObject(ExcelWorkSheet);
-                Marshal.ReleaseComObject(ExcelWorkBook);
-                Marshal.ReleaseComObject(ExcelExport);
-
-                return RedirectToAction("Index", new { a = "Excel Document was created sucessfully and it should be available in your Documents folder.", color = "green", emailStatus = isEmailSend });
-            }
-            catch 
-            {
-                ExcelWorkBook.Close(true, misValue, misValue);
-                
-                ExcelExport.Quit();
-
-
-                Marshal.ReleaseComObject(ExcelWorkSheet);
-                Marshal.ReleaseComObject(ExcelWorkBook);
-                Marshal.ReleaseComObject(ExcelExport);
-                
-                System.Diagnostics.Debug.WriteLine("Excel Document was not created.");
-                 return RedirectToAction("Index", new { a = "Excel Document was not created.", color = "red", emailStatus = isEmailSend });
-            }
-
+            SqlConnection sqlConnection = new SqlConnection(ConfigurationManager.ConnectionStrings["UMS"].ConnectionString);
+            SqlCommand sqlCommand = new SqlCommand("IntoExcel", sqlConnection);
+            sqlCommand.CommandType = CommandType.StoredProcedure;
+            sqlCommand.Parameters.AddWithValue("@FileName",fileName);
+            sqlCommand.Parameters.AddWithValue("@SendEmailTo", sendEmailTo);
+            sqlConnection.Open();
+            sqlCommand.ExecuteReader();
+            sqlConnection.Close();
+            return RedirectToAction("Index", new { a = "Excel Document was created sucessfully and it should be available in your Documents folder within the next few minutes.", color = "green" });
         }
         /*private static Image BinaryToImage(byte[] binaryData)
         {
